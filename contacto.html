@@ -21,15 +21,12 @@
             if (dataBase.length > 0){   
                 let tbody = $('#contacts-table tbody');
                 dataBase.forEach(contact => {
-                    let previewComments = contact.comments.length > 15 
-                        ? contact.comments.substring(0, 15) + "..."
-                        : contact.comments;
                     tbody.append(`
                     <tr>
                         <td>${contact.name}</td>
+                        <td>${contact.phone}</td>
                         <td>${contact.email}</td>
                         <td>${contact.country}</td>
-                        <td title="${contact.comments}">${previewComments}</td>
                         <td>
                             <button class="btn btn-edit btn-success btn-sm mr-3">Editar</button>
                             <button class="btn btn-delete btn-danger btn-sm">Eliminar</button>
@@ -48,12 +45,15 @@
                 });
                 $('button[type="submit"]').on('click',function(e){
                 let name = $('#inputName').val();
+                let phone = $('#inputPhone').val();
                 let email = $('#inputEmail').val();
                 let country = $('#selectCountry').val();
-                let comments = $("#commentsTextarea").val();
                 let error = [];
                 if (name == ''){
                     error.push("Debe completar su nombre")
+                }
+                if (phone == ''){
+                    error.push("Debe completar su teléfono")
                 }
                 if(email == ''){
                     error.push("Debe completar su email");
@@ -66,9 +66,6 @@
                 if(country == ''){
                     error.push("Debe selecionar su país");
                 }
-                if(comments == ''){
-                    error.push("Debe dejar un mensaje");
-                }
                 if(error.length > 0){
                     $('#error-list').empty();
                     e.preventDefault();
@@ -80,9 +77,9 @@
                     const contact = {
                         id: Date.now(),
                         name: name,
+                        phone: phone,
                         email: email,
                         country: country,
-                        comments: comments
                     };
                 if(editMode && editIndex !== null){
                         dataBase[editIndex] = contact;
@@ -94,7 +91,7 @@
                     }
                     localStorage.setItem("contactos", JSON.stringify(dataBase));
                     $('input, #commentsTextarea, select').val('');
-                    $('#containerCapital').hide();
+                    $('#containerOfficial').hide();
                     $('#div-error').hide();
                         location.reload();
                 }
@@ -104,9 +101,9 @@
                 editIndex = row.index();
                 let contact = dataBase[editIndex];
                 $('#inputName').val(contact.name);
+                $('#inputPhone').val(contact.phone);
                 $('#inputEmail').val(contact.email);
                 $('#selectCountry').val(contact.country).trigger('change');
-                $('#commentsTextarea').val(contact.comments);
                 $('button[type="submit"]').text('Guardar Cambios');
                 editMode = true;
             });
@@ -124,28 +121,28 @@
                 }
             });
             $.ajax({
-                url:'https://restcountries.com/v3.1/lang/spanish',
+                url: 'https://restcountries.com/v3.1/lang/spanish',
                 method: 'GET',
-                success: function(data){
+                success: function(data) {
                     $('#selectCountry').empty();
                     $('#selectCountry').append('<option value="">Seleccione su país</option>');
-                    data.forEach(function(country){
-                        const countryName = country.name.common;
-                        const capitalName = country.capital[0];
-                        $('#selectCountry').append('<option data-capital="'+capitalName+'" value="'+countryName+'">'+countryName+'</option>');
-                    })
+                    data.forEach(function(country) {
+                        const commonName = country.name.common;
+                        const officialName = country.name.nativeName.spa.official;
+                        $('#selectCountry').append('<option data-official="'+officialName+'" value="'+commonName+'">'+commonName+'</option>');
+                    });
                     $('#otherCountry').remove();
                 },
-                error: function(){
-                    alert("No pudimos cargar la lista de paises, intente nuevamente");
+                error: function() {
+                    alert("No pudimos cargar la lista de países, intente nuevamente");
                     $('#selectCountry').remove();
                     $('#otherCountry').show();
                 }
             });
-            $('#selectCountry').on('change',function(){
+            $('#selectCountry').on('change', function() {
                 const optionSelected = $('#selectCountry option:selected');
-                $('#containerCapital input').val(optionSelected.data('capital'));
-                $('#containerCapital').show();
+                $('#containerOfficial input').val(optionSelected.data('official'));
+                $('#containerOfficial').show();
             });
         })
     </script>    
@@ -156,7 +153,7 @@
         <a class="navbar-brand" href="#"><img src="images/logo.png"></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             ariacontrols="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav justify-content-end">
@@ -194,7 +191,12 @@
             <div class="form-group">
                 <label for="inputName">Nombre (*)</label>
                 <input type="text" class="form-control" id="inputName" placeholder="Ej: Puffy Amigurumis">
-            </div><div class="form-group">
+            </div>
+            <div class="form-group">
+                <label for="inputPhone">Teléfono (*)</label>
+                <input type="text" class="form-control" id="inputPhone" placeholder="Ej: +569988776655">
+            </div>
+            <div class="form-group">
                 <label for="inputEmail">Email (*)</label>
                 <input type="text" class="form-control" id="inputEmail" placeholder="Ej: puffy@amigurumis.xd">
             </div>
@@ -205,13 +207,9 @@
                 </select>
                 <input type="text" class="form-control" id="otherCountry" >
             </div>
-            <div class="form-group" id="containerCapital" style="display: none;">
-                <label for="inputEmail">Capital</label>
+            <div class="form-group" id="containerOfficial" style="display: none;">
+                <label for="inputEmail">Nombre oficial del País</label>
                 <input type="text" class="form-control" id="inputCapital" disabled />
-            </div>
-            <div class="form-group">
-                <label for="commentsTextarea">Mensaje (*)</label>
-                <textarea class="form-control" id="commentsTextarea" placeholder="Dejanos tu mensaje" rows="3"></textarea>
             </div>
             <div id="div-error" class="alert alert-danger" style="display: none;">
                 <ul id="error-list"></ul>
@@ -223,14 +221,14 @@
             </div>
         </form>
         <br><br>
-        <h2 class="mb-4">Contactos</h2>
+        <h2 class="mb-7">Contactos</h2>
         <table id="contacts-table" style="display: none;" class="table table-striped">
             <thead class="thead-dark">
                 <tr>
                     <th>Nombre</th>
+                    <th>Teléfono</th>
                     <th>Email</th>
-                    <th>País</s></th>
-                    <th>Mensaje</th>
+                    <th>País</th>
                     <th>Editar</th>
                 </tr>
             </thead>
