@@ -1,0 +1,72 @@
+*{
+    font-family: 'Montserrat';
+}
+img{
+    width: 100px;
+}
+header,article,footer{
+    border:2px dotted #a8e4fc;
+    margin-bottom:1em;
+}
+#slider{
+    border:2px dotted #a8e4fc;
+    margin-bottom:1em;
+    text-align: center;
+    padding: 14em 0em 2em 0em;
+}
+
+#info .articleInfo{
+    display: inline-block;
+    min-height: 180px;
+    width: 32.75%;
+}
+#ig .articleInfo{
+    display: inline-block;
+    min-height: 400px;
+    width: 24.4%;
+}
+#header{
+    min-height: 50px;
+}
+.center{
+    text-align: center;
+}
+footer p{
+    text-align: center;
+}
+#slider button:hover{
+    cursor: pointer;
+}
+
+input[type=text], select, textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  resize: vertical
+}
+
+
+input[type=submit] {
+  background-color: #04AA6D;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+
+.container {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+}
